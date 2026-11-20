@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>眨眼溝通挑戰(鏡頭版)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE: tender but playful classroom game, short warm sentences
+   IDEA: a laminated bedside communication board, used by someone who can only blink
+   PICTURE: the 3x3 board itself, large, with the highlight moving across it
+   COLOUR and TYPE: deck navy #163459 field, teal #9FD3E0 highlight, coral #F4A27E accent; Noto Sans TC
+   LAYOUT: board left, control card right; stacks below 760px as board then card */
+:root{color-scheme:dark;--bg:#163459;--deep:#0f2645;--card:#1e4170;--ink:#f4f8fb;--soft:#b9cbe0;--teal:#9FD3E0;--coral:#F4A27E;--line:rgba(159,211,224,.28)}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:radial-gradient(1200px 700px at 85% -10%,#2a6f8f 0%,transparent 60%),var(--bg);color:var(--ink);font:17px/1.6 "Noto Sans TC",system-ui,sans-serif;min-height:100vh;overflow-x:clip}
+.wrap{max-width:1240px;margin:0 auto;padding:clamp(20px,3.5vw,48px) max(4vw,16px)}
+header h1{font-size:clamp(30px,4.4vw,50px);line-height:1.1;margin:0 0 8px;font-weight:900;text-wrap:balance}
+header p{margin:0;color:var(--soft);max-width:62ch}
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px;padding:0;list-style:none}
+.steps li{padding:6px 14px;border-radius:999px;border:1px solid var(--line);color:var(--soft);font-size:15px}
+.steps li.on{background:var(--teal);color:var(--deep);border-color:var(--teal);font-weight:700}
+.steps li.done{color:var(--teal);border-color:var(--teal)}
+.game{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(16px,2.5vw,32px);align-items:start}
+.boardbox{background:#f3efe6;border-radius:28px;padding:clamp(12px,2vw,22px);box-shadow:0 30px 60px -20px rgba(0,0,0,.55),inset 0 0 0 6px #e3dccd}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.4vw,14px)}
+.cell{aspect-ratio:1.15;border-radius:18px;background:#fff;color:#1b2b40;display:grid;place-items:center;text-align:center;font-weight:700;font-size:clamp(20px,3.2vw,36px);border:3px solid #d9d1c0;transition:background .12s,transform .12s,box-shadow .12s;position:relative}
+.cell small{display:block;font-size:.42em;font-weight:500;color:#6b7686;margin-top:2px}
+.row-on .cell{background:#dff1f6;border-color:var(--teal)}
+.cell.on{background:var(--teal);border-color:#5fb3c8;transform:scale(1.04);box-shadow:0 10px 24px -8px rgba(22,52,89,.6)}
+.cell.flash{background:#fff7c7;border-color:#f0c54a;transform:scale(1.06);box-shadow:0 0 0 6px rgba(240,197,74,.35)}
+.cell.pick{background:var(--coral);border-color:#e07f57;color:#fff}
+.cell.pick small{color:#fff}
+.cell::before{content:"";position:absolute;left:10%;bottom:10px;height:8px;border-radius:4px;width:calc(var(--p,0)*80%);background:var(--coral);opacity:.9}
+.cell.look{border-color:var(--coral);background:#fff3ec}
+.cell.calib{background:var(--coral);border-color:#e07f57;color:#fff}
+.cell.calib small{color:#fff}
+.cell.target::after{content:"目標";position:absolute;top:8px;right:10px;font-size:13px;font-weight:700;color:#c25a32}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:clamp(18px,2.4vw,28px)}
+.card h2{font-size:26px;line-height:1.2;margin:0 0 6px}
+.card .how{color:var(--soft);margin:0 0 16px}
+.goal{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;background:var(--deep);border-radius:16px;padding:12px 16px;margin-bottom:14px}
+.goal span{color:var(--soft);font-size:15px}
+.goal b{font-size:30px;color:var(--coral)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--deep);border-radius:14px;padding:10px 14px}
+.stat span{display:block;color:var(--soft);font-size:14px}
+.stat b{font-size:28px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dots{display:flex;gap:8px;margin-top:4px}.dots i{width:18px;height:18px;border-radius:50%;border:2px solid var(--teal)}.dots i.f{background:var(--teal)}
+.msg{min-height:52px;margin:0 0 14px;color:var(--teal);font-weight:500}
+.msg.bad{color:var(--coral)}
+button{font:inherit;cursor:pointer;border:0;border-radius:18px;min-height:48px;padding:0 20px}
+button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.blink{width:100%;min-height:96px;font-size:26px;font-weight:900;background:var(--coral);color:#3a1606;box-shadow:0 8px 0 #c86f4a;transition:transform .06s,box-shadow .06s;touch-action:manipulation;user-select:none}
+.blink:active,.blink.press{transform:translateY(6px);box-shadow:0 2px 0 #c86f4a}
+.blink:disabled{opacity:.45;cursor:default}
+.blink small{display:block;font-size:14px;font-weight:500}
+.ghost{background:transparent;color:var(--teal);border:1px solid var(--teal)}
+.primary{background:var(--teal);color:var(--deep);font-weight:700;font-size:19px;min-height:56px;width:100%}
+.speed{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.speed span{color:var(--soft);font-size:15px;margin-right:4px}
+.speed button{min-height:44px;background:var(--deep);color:var(--soft);border:1px solid var(--line)}
+.speed button.on{background:var(--teal);color:var(--deep);font-weight:700}
+.note{font-size:14px;color:var(--soft);margin:14px 0 0}
+.speech{font-size:clamp(26px,4vw,40px);font-weight:900;color:#1b2b40;min-height:3.2em;display:grid;place-items:center;text-align:center;padding:20px}
+.speech .cur{display:inline-block;width:3px;height:1em;background:#1b2b40;margin-left:4px;vertical-align:-3px;animation:b 1s steps(2) infinite}
+@keyframes b{50%{opacity:0}}
+.result h2{font-size:clamp(28px,3.6vw,40px);line-height:1.15;margin:0 0 18px;text-wrap:balance}
+.bars{display:grid;gap:14px;margin:0 0 22px}
+.bar label{display:flex;justify-content:space-between;gap:10px;font-size:16px;margin-bottom:4px}
+.bar label b{white-space:nowrap;font-variant-numeric:tabular-nums}
+.track{background:var(--deep);border-radius:10px;height:26px;overflow:hidden}
+.fill{height:100%;border-radius:10px;background:var(--teal);width:0;transition:width 1s ease-out}
+.fill.c{background:var(--coral)}
+.ask{background:var(--deep);border-left:0;border-radius:16px;padding:16px 18px;margin:0 0 18px;font-size:19px;font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row button{flex:1 1 180px}
+.cam{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+.cam .camrow{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;align-items:center}
+.cam video{width:132px;height:99px;object-fit:cover;border-radius:12px;background:var(--deep);transform:scaleX(-1)}
+.meter{height:16px;background:var(--deep);border-radius:8px;overflow:hidden;margin:6px 0}
+.meter i{display:block;height:100%;width:0;background:var(--teal);transition:width .05s}
+.meter i.shut{background:var(--coral)}
+.cam label{display:flex;justify-content:space-between;gap:8px;font-size:14px;color:var(--soft)}
+.cam input[type=range]{width:100%;accent-color:var(--teal)}
+.camstat{font-size:14px;color:var(--soft);margin:6px 0 0}
+#hud{display:none}
+body.big{overflow:hidden}
+body.big .boardbox{position:fixed;inset:0;z-index:50;border-radius:0;padding:118px 2vw 2vw;box-shadow:none}
+body.big .board{height:100%;grid-template-rows:repeat(3,minmax(0,1fr))}
+body.big .cell{aspect-ratio:auto;font-size:clamp(22px,min(6vh,8vw),72px);border-width:5px}
+body.big #hud{display:flex;position:fixed;z-index:60;top:0;left:0;right:0;height:106px;align-items:center;gap:14px;padding:0 2vw;background:var(--bg);flex-wrap:nowrap}
+#hud .hg{font-size:15px;color:var(--soft);white-space:nowrap}#hud .hg b{font-size:30px;color:var(--coral);margin-left:6px}
+#hud .ht{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+#hud .hm{flex:1;color:var(--teal);font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#hud button{min-height:52px;white-space:nowrap}
+#hud .primary{width:auto;padding:0 26px}
+#gdot{display:none;position:fixed;left:0;top:0;width:32px;height:32px;border-radius:50%;border:4px solid var(--coral);background:rgba(244,162,126,.25);z-index:90;pointer-events:none;box-shadow:0 0 0 3px rgba(255,255,255,.6)}
+#guide{position:fixed;left:0;right:0;bottom:0;top:106px;z-index:70;display:grid;place-items:center;background:rgba(15,38,69,.6);padding:20px}
+#guide.mini{background:transparent;place-items:end center;pointer-events:none}
+#guide.mini .gcard{pointer-events:auto;padding:18px 22px}
+#guide.mini #gtext{font-size:18px;margin-bottom:12px}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px;max-width:660px;width:100%;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+.gk{margin:0 0 10px;color:var(--soft);font-size:15px}
+#gsteps{list-style:none;display:flex;gap:8px;flex-wrap:wrap;padding:0;margin:0 0 18px}
+#gsteps li{padding:6px 14px;border-radius:999px;border:1px solid var(--line);color:var(--soft);font-size:15px}
+#gsteps li.on{background:var(--coral);color:#3a1606;border-color:var(--coral);font-weight:700}
+#gsteps li.done{color:var(--teal);border-color:var(--teal)}
+#gtext{font-size:22px;line-height:1.55;margin:0 0 20px}
+#gbtns button{flex:1 1 200px;min-height:56px;font-size:18px}
+.gmeter{height:18px;background:var(--deep);border-radius:9px;overflow:hidden;margin:-6px 0 18px}.gmeter i{display:block;height:100%;width:0;background:var(--teal)}
+[hidden]{display:none!important}
+@media (max-width:760px){.game{grid-template-columns:minmax(0,1fr)}.cell.target::after{font-size:11px;top:4px;right:6px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>如果你只剩下「眨眼」這一個動作</h1>
+<p>想像你是一位漸凍人,全身幾乎動不了,只剩一個動作能用。用四種不同的溝通方式,把一句需求傳達出去,看看各要花多久。</p>
+</header>
+<ul class="steps" id="steps">
+<li data-s="scan">1 掃描板</li><li data-s="gaze">2 眼動盯選</li><li data-s="p300">3 P300 閃爍板</li><li data-s="speech">4 語音 BCI</li><li data-s="result">結果</li>
+</ul>
+
+<div id="hud"><div class="hg">目標<b id="hgoal"></b></div><div class="ht" id="htime"></div><div class="hm" id="hmsg"></div><button class="primary" id="hstart"></button><button class="primary" id="hpress" hidden style="background:var(--coral);color:#3a1606"></button><span class="hg" id="hcam" style="max-width:220px;white-space:normal;line-height:1.3">鏡頭未開啟</span><button class="ghost" id="hcalib">開啟鏡頭</button><button class="ghost" id="hexit">縮小</button></div>
+<div id="guide" hidden><div class="gcard"><p class="gk" id="gk">開始前的準備</p><ol id="gsteps"></ol><p id="gtext"></p><div class="gmeter" id="gmeter" hidden><i id="gmi"></i></div><div class="row" id="gbtns"></div></div></div>
+<section class="game" id="game">
+<div class="boardbox">
+<div class="board" id="board"></div>
+<div class="speech" id="speech" hidden></div>
+</div>
+
+<div class="card" id="card">
+<h2 id="title">第 1 關:單鍵掃描板</h2>
+<p class="how" id="how">亮光會一列一列往下移。目標那一列亮起時按一下,接著亮光會在那一列裡一格一格移動,目標那格亮起時再按一下。</p>
+<div class="goal"><span>你要說的是</span><b id="goal">叫家人</b></div>
+<button class="ghost" id="bigon" style="width:100%;margin-bottom:14px">放大格子(全螢幕,眼睛比較好選)</button>
+<div class="speed" id="speed"><span>掃描速度</span><button data-v="1500">慢</button><button data-v="1000" class="on">中</button><button data-v="700">快</button></div>
+<div class="stats">
+<div class="stat"><span>經過時間</span><b id="time">0.0 秒</b></div>
+<div class="stat" id="stat2"><span>被誤會次數</span><b id="err">0</b></div>
+</div>
+<p class="msg" id="msg">準備好就按「開始」。</p>
+<button class="primary" id="start">開始</button>
+<button class="blink" id="blink" hidden>眨眼<small>按這裡,或按空白鍵</small></button>
+<p class="note" id="note"></p>
+<div class="cam">
+<button class="ghost" id="camon" style="width:100%">開啟鏡頭:用「閉眼」來按</button>
+<div id="campanel" hidden>
+<div class="camrow"><video id="vid" playsinline muted></video>
+<div><label><span>眼睛閉合程度</span><span id="eyev">–</span></label><div class="meter"><i id="eyem"></i></div>
+<label><span>靈敏度(越低越容易觸發)</span><span id="thv">0.50</span></label><input type="range" id="th" min="0.25" max="0.8" step="0.05" value="0.5">
+<label><span>閉眼多久算一次</span><span id="hov">0.35 秒</span></label><input type="range" id="ho" min="0.15" max="1" step="0.05" value="0.35"></div></div>
+<p class="camstat" id="camstat">正在載入臉部偵測……</p>
+<div class="row" style="margin-top:10px" id="gzrow" hidden><button class="ghost" id="calib">校正視線(眼動盯選用)</button></div>
+<p class="camstat" id="gzstat"></p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="card result" id="result" hidden>
+<h2 id="rtitle"></h2>
+<div class="bars" id="bars"></div>
+<p class="ask">討論:如果每一句話都要花這麼久,你會選擇說什麼?又會放棄說什麼?</p>
+<p class="note">這是課堂體驗用的模擬,不是真的腦波:時間會依每個人的疲勞、專注與訓練程度而不同。真實的 P300 不需要按鍵,是由腦波偵測你「注意到目標」的反應;植入式語音 BCI 需要開腦手術,目前仍在臨床試驗階段。</p>
+<div class="row" style="margin-top:18px"><button class="primary" id="again">再玩一次</button></div>
+</section>
+</div>
+
+<script>
+{
+const ITEMS=[['喝水','口渴'],['翻身','姿勢不舒服'],['好痛','身體某處'],['太熱','或太冷'],['休息','我累了'],['叫家人','請找人來'],['抽痰','呼吸卡住'],['是',''],['否','']];
+const ROUNDS={
+  scan:{title:'第 1 關:單鍵掃描板',goal:'叫家人',how:'亮光會一列一列往下移。目標那一列亮起時按一下,接著亮光會在那一列裡一格一格移動,目標那格亮起時再按一下。',note:'這很像眼動或單一開關的輔具:選擇不難,但要一直等亮光輪到你。'},
+  gaze:{title:'第 2 關:眼動追蹤盯選',goal:'翻身',how:'眼睛盯著目標格子,不要移開,盯滿 2 秒就會選取。小心:盯著別的格子太久,也會被選走。',note:''},
+  p300:{title:'第 3 關:P300 閃爍板',goal:'喝水',how:'格子會隨機一格一格閃。眼睛盯著目標,每次「目標」閃起來就按一下。累積 3 次,系統才會確定你要選它。',note:'真實的 P300 不用按:大腦看到期待中的目標,約 300 毫秒後會出現一個腦波反應。這裡用按鍵代替那個「注意到了」的反應。'},
+  speech:{title:'第 4 關:植入式語音 BCI',goal:'我累了,需要休息。',how:'按下按鈕,代表你「試著把這句話說出來」。電極讀取說話運動區送往嘴巴、舌頭的指令,再轉成文字。',note:'速度快很多,但需要開腦手術植入電極,目前仍在臨床試驗。'}
+};
+const $=id=>document.getElementById(id);
+const board=$('board'),cells=[];
+board.innerHTML=ITEMS.map(([a,b],i)=>`<div class="cell" data-i="${i}">${a}${b?`<small>${b}</small>`:''}</div>`).join('');
+board.querySelectorAll('.cell').forEach(c=>cells.push(c));
+let mode='scan',running=false,t0=0,tick=null,clock=null,errs=0,speed=1000;
+const res={};
+let sc={phase:'row',r:0,c:0,loops:0};
+let p3={seq:[],flashes:[],hits:0,used:new Set()};
+
+function setSteps(){document.querySelectorAll('#steps li').forEach(li=>{const order=['scan','gaze','p300','speech','result'];const a=order.indexOf(li.dataset.s),b=order.indexOf(mode);li.className=a===b?'on':a<b?'done':''})}
+function clearBoard(){board.classList.remove('row-on');cells.forEach(c=>c.className='cell');board.querySelectorAll('.rowwrap').forEach(()=>{})}
+function markTarget(){const g=ROUNDS[mode].goal;cells.forEach((c,i)=>{if(ITEMS[i][0]===g)c.classList.add('target')})}
+function fmt(ms){return (ms/1000).toFixed(1)+' 秒'}
+function say(t,bad){const m=$('msg');m.textContent=t;m.className='msg'+(bad?' bad':'')}
+
+function setup(){
+  stop();const R=ROUNDS[mode];setSteps();
+  $('game').hidden=mode==='result';$('result').hidden=mode!=='result';
+  if(mode==='result'){showResult();return}
+  $('title').textContent=R.title;$('how').textContent=R.how;$('goal').textContent=R.goal;$('note').textContent=R.note;
+  $('speed').hidden=mode!=='scan';
+  if(mode==='gaze')$('note').textContent=window.gazeOn?'正在用鏡頭追蹤你的視線。頭盡量不要動;如果一直選錯,按「重新校正」。':'目前用滑鼠游標代替視線(把游標停在格子上)。開啟鏡頭並完成校正後,就能真的用眼睛盯。';
+  $('stat2').innerHTML=mode==='p300'?'<span>確認次數</span><div class="dots" id="dots"><i></i><i></i><i></i></div>':mode==='speech'?'<span>需要的動作</span><b>試著說</b>':'<span>被誤會次數</span><b id="err">0</b>';
+  $('time').textContent='0.0 秒';errs=0;
+  const sp=mode==='speech';board.hidden=sp;$('speech').hidden=!sp;
+  if(sp){$('speech').innerHTML='<span style="color:#8a94a3;font-size:.6em;font-weight:500">電極待命中……</span>'}
+  clearBoard();if(!sp)markTarget();
+  $('start').hidden=false;$('start').textContent='開始';$('blink').hidden=true;
+  $('blink').innerHTML=sp?'試著說出來<small>按這裡,或按空白鍵</small>':'眨眼<small>按這裡,或按空白鍵</small>';
+  say('準備好就按「開始」。');
+}
+function begin(){
+  running=true;t0=performance.now();$('start').hidden=true;$('blink').hidden=false;$('blink').disabled=false;
+  clock=setInterval(()=>{$('time').textContent=fmt(performance.now()-t0)},100);
+  if(mode==='scan'){sc={phase:'row',r:-1,c:-1,loops:0};say('等目標那一列亮起來……');stepScan();tick=setInterval(stepScan,speed)}
+  if(mode==='p300'){p3={seq:[],flashes:[],hits:0,used:new Set()};say('盯著「喝水」,它一閃就按!');tick=setInterval(stepP300,520)}
+  if(mode==='speech'){say('準備好就按下按鈕,試著把句子說出來。')}
+  if(mode==='gaze'){$('blink').hidden=true;gz={cell:-1,dwell:0};say('盯著「翻身」2 秒……');tick=setInterval(stepGaze,100)}
+  $('blink').focus({preventScroll:true});
+}
+function stop(){running=false;clearInterval(tick);clearInterval(clock);tick=null;cells.forEach(c=>{c.classList.remove('look');c.style.removeProperty('--p')})}
+let gz={cell:-1,dwell:0},mouseCell=-1;
+board.addEventListener('pointermove',e=>{const c=e.target.closest('.cell');mouseCell=c?+c.dataset.i:-1});
+board.addEventListener('pointerleave',()=>{mouseCell=-1});
+const DWELL=2000;
+function stepGaze(){
+  const cur=window.gazeOn?window.gazeCell:mouseCell;
+  if(cur!==gz.cell){if(gz.cell>=0){cells[gz.cell].classList.remove('look');cells[gz.cell].style.removeProperty('--p')}gz.cell=cur;gz.dwell=0}
+  if(cur<0)return;
+  gz.dwell+=100;const c=cells[cur];c.classList.add('look');c.style.setProperty('--p',Math.min(gz.dwell/DWELL,1));
+  if(gz.dwell>=DWELL){
+    const w=ITEMS[cur][0];c.classList.remove('look');c.style.removeProperty('--p');gz.dwell=-800;
+    if(w===ROUNDS.gaze.goal){finish(cur);return}
+    errs++;$('err').textContent=errs;c.classList.add('pick');setTimeout(()=>c.classList.remove('pick'),700);
+    say(`盯太久,選到了「${w}」……照顧者誤會了。`,true);
+  }
+}
+
+function paintScan(){
+  cells.forEach(c=>c.classList.remove('on'));board.classList.remove('row-on');
+  if(sc.phase==='row'){for(let k=0;k<3;k++)cells[sc.r*3+k].classList.add('on')}
+  else cells[sc.r*3+sc.c].classList.add('on');
+}
+function stepScan(){
+  if(sc.phase==='row'){sc.r=(sc.r+1)%3}
+  else{sc.c++;if(sc.c>2){sc.c=0;sc.loops++;if(sc.loops>=2){sc.phase='row';sc.r=0;sc.loops=0;say('沒選到,回到一列一列掃描。',true)}}}
+  paintScan();
+}
+function pressScan(){
+  if(sc.phase==='row'){sc.phase='col';sc.c=-1;sc.loops=0;say('選到這一列了,等目標那格亮起來……');clearInterval(tick);stepScan();tick=setInterval(stepScan,speed);return}
+  const i=sc.r*3+sc.c,w=ITEMS[i][0];
+  if(w===ROUNDS.scan.goal){finish(i);return}
+  errs++;$('err').textContent=errs;
+  cells[i].classList.add('pick');setTimeout(()=>cells[i].classList.remove('pick'),700);
+  say(`照顧者以為你說「${w}」……重來一次。`,true);
+  sc.phase='row';sc.r=-1;clearInterval(tick);stepScan();tick=setInterval(stepScan,speed);
+}
+
+function stepP300(){
+  if(!p3.seq.length){p3.seq=[...ITEMS.keys()].sort(()=>Math.random()-.5)}
+  const i=p3.seq.pop();const now=performance.now();
+  p3.flashes.push({i,t:now});p3.flashes=p3.flashes.filter(f=>now-f.t<1500);
+  cells[i].classList.add('flash');setTimeout(()=>cells[i].classList.remove('flash'),260);
+}
+function pressP300(){
+  const now=performance.now(),g=ITEMS.findIndex(x=>x[0]===ROUNDS.p300.goal);
+  const f=p3.flashes.find(f=>f.i===g&&now-f.t<800&&!p3.used.has(f.t));
+  if(f){p3.used.add(f.t);p3.hits++;document.querySelectorAll('#dots i').forEach((d,k)=>d.classList.toggle('f',k<p3.hits));
+    if(p3.hits>=3){finish(g);return}say(`抓到了!還要 ${3-p3.hits} 次。`)}
+  else{errs++;say('系統把注意力反應配到別的格子,這次不算。保持專心!',true)}
+}
+
+const PHRASE='我累了,需要休息。';
+function pressSpeech(){
+  $('blink').disabled=true;say('解碼中……');let k=0;const box=$('speech');
+  const iv=setInterval(()=>{k++;box.innerHTML=PHRASE.slice(0,k)+'<span class="cur"></span>';
+    if(k>=PHRASE.length){clearInterval(iv);box.innerHTML=PHRASE;finish(-1)}},110);
+}
+
+function finish(i){
+  const ms=performance.now()-t0;stop();$('time').textContent=fmt(ms);$('blink').hidden=true;
+  if(i>=0){clearBoard();cells[i].classList.add('pick')}
+  res[mode]={ms,errs};
+  say(mode==='speech'?`完成!只花了 ${fmt(ms)}。`:`成功傳達「${ROUNDS[mode].goal}」!花了 ${fmt(ms)}。`);
+  const next={scan:'gaze',gaze:'p300',p300:'speech',speech:'result'}[mode];
+  $('start').hidden=false;$('start').textContent=next==='result'?'看結果':'下一關';
+  $('start').onclick=()=>{mode=next;$('start').onclick=startClick;setup()};
+}
+function startClick(){if(!running)begin()}
+$('start').onclick=startClick;
+
+function press(){
+  if(!running||mode==='gaze'||$('blink').disabled)return;
+  const b=$('blink');b.classList.add('press');setTimeout(()=>b.classList.remove('press'),90);
+  if(mode==='scan')pressScan();else if(mode==='p300')pressP300();else pressSpeech();
+}
+$('blink').addEventListener('pointerdown',e=>{e.preventDefault();press()});
+$('blink').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();press()}});
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();if(running)press();else if(!$('start').hidden&&mode!=='result')$('start').click()}
+});
+$('speed').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;speed=+b.dataset.v;
+  $('speed').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  if(running&&mode==='scan'){clearInterval(tick);tick=setInterval(stepScan,speed)}});
+
+function showResult(){
+  const rows=[['scan','單鍵掃描板','叫家人',''],['gaze','眼動盯選','翻身',''],['p300','P300 閃爍板','喝水',''],['speech','植入式語音 BCI','一整句話','c']];
+  const max=Math.max(...rows.map(r=>res[r[0]]?.ms||0),1);
+  const a=res.scan?.ms||0,c=res.speech?.ms||0;
+  $('rtitle').textContent=`說三個字,掃描板花了 ${fmt(a)};說一整句話,語音 BCI 只花了 ${fmt(c)}`;
+  $('bars').innerHTML=rows.map(([k,n,w,cl])=>`<div class="bar"><label><span>${n}(${w})${res[k]?.errs?`・被誤會 ${res[k].errs} 次`:''}</span><b>${fmt(res[k]?.ms||0)}</b></label><div class="track"><div class="fill ${cl}" data-w="${(res[k]?.ms||0)/max*100}"></div></div></div>`).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%')));
+}
+$('again').onclick=()=>{for(const k in res)delete res[k];mode='scan';setup()};
+
+window.gameMode=()=>mode;window.gameRunning=()=>running;window.gameEye=()=>{if(running)press();else{blinkOK=true;guideUpdate()}};
+let confirmed=false,blinkOK=false,skipCam=false;
+const GOAL={scan:'亮光輪到「叫家人」那一列時閉眼一下,再等那一格亮起時閉眼一下。',gaze:'眼睛盯著「翻身」不要移開,盯滿 2 秒就會選取。',p300:'盯著「喝水」,它每閃一次就閉眼一下,累積 3 次。',speech:'按「開始」後,再按上方橘色的「試著說出來」(或閉眼一下)。'};
+const guideSteps=()=>mode==='gaze'?[['cam','開啟鏡頭'],['cal','校正視線'],['chk','確認圓點'],['go','開始']]:(mode==='scan'||mode==='p300')?[['cam','開啟鏡頭'],['blk','試試閉眼'],['go','開始']]:[['go','開始']];
+const stepDone=k=>k==='go'?false:skipCam?true:k==='cam'?!!window.camReady:k==='cal'?!!window.gazeOn:k==='chk'?confirmed&&!!window.gazeOn:k==='blk'?blinkOK:false;
+const gbtn=(t,fn,cls='primary')=>{const b=document.createElement('button');b.className=cls;b.textContent=t;b.onclick=fn;return b};
+window.eyeLevel=v=>{const m=$('gmi');if(m)m.style.width=Math.min(v,1)*100+'%'};
+function guideUpdate(){
+  const g=$('guide');if(!g)return;
+  const show=document.body.classList.contains('big')&&!running&&!$('start').hidden&&$('start').textContent==='開始'&&!window.calibrating&&mode!=='result';
+  g.hidden=!show;if(!show)return;
+  const st=guideSteps(),cur=st.find(([k])=>!stepDone(k))[0];
+  $('gk').textContent=ROUNDS[mode].title+'|開始前的準備';
+  $('gsteps').innerHTML=st.map(([k,n])=>`<li class="${k===cur?'on':stepDone(k)?'done':''}">${stepDone(k)?'✓ ':''}${n}</li>`).join('');
+  g.classList.toggle('mini',cur==='chk');$('gmeter').hidden=cur!=='blk';
+  const bt=$('gbtns');bt.innerHTML='';const t=$('gtext');
+  const skip=gbtn('不用鏡頭,改用鍵盤/滑鼠',()=>{skipCam=true;guideUpdate()},'ghost');
+  if(cur==='cam'){
+    t.textContent=window.camLoading?'鏡頭和臉部偵測載入中,請稍等幾秒……':window.camErr?window.camErr:'請坐在鏡頭正前方,臉要亮,頭盡量保持不動。瀏覽器問能不能用相機時,請按「允許」。';
+    if(!window.camLoading)bt.append(gbtn(window.camErr?'再試一次':'開啟鏡頭',()=>{if(!$('camon').hidden)$('camon').click()}));bt.append(skip);
+  }else if(cur==='cal'){
+    t.textContent='等一下九個格子會輪流變橘色。頭不要動,只轉眼睛,盯著橘色格子正中間的字,大約 20 秒。';
+    bt.append(gbtn('開始校正',()=>$('calib').click()),skip);
+  }else if(cur==='chk'){
+    t.textContent='看看橘色圓點:眼睛輪流看四個角落的格子,圓點有沒有跟過去?';
+    bt.append(gbtn('準的,下一步',()=>{confirmed=true;guideUpdate()}),gbtn('不準,重新校正',()=>{confirmed=false;$('calib').click()},'ghost'));
+  }else if(cur==='blk'){
+    t.textContent='刻意閉上眼睛約半秒,就等於按一下按鈕(自然眨眼太短,不會算)。現在試一次!閉眼時下面的條會變滿。';
+    bt.append(gbtn('跳過',()=>{blinkOK=true;guideUpdate()},'ghost'));
+  }else{
+    t.textContent=(skipCam&&mode!=='gaze'&&mode!=='speech'?'用空白鍵或點格子代替閉眼。':'')+(skipCam&&mode==='gaze'?'用滑鼠游標代替視線:把游標停在格子上。':'')+GOAL[mode];
+    bt.append(gbtn('開始',()=>$('start').click()));
+  }
+}
+window.guideUpdate=guideUpdate;
+
+const sync=()=>{guideUpdate();$('hgoal').textContent=$('goal').textContent;$('htime').textContent=$('time').textContent;$('hmsg').textContent=$('msg').textContent;$('hmsg').style.color=$('msg').classList.contains('bad')?'var(--coral)':'';$('hstart').textContent=$('start').textContent;$('hstart').hidden=$('start').hidden;const hp=$('hpress');hp.hidden=!running||mode==='gaze';hp.textContent=mode==='speech'?'試著說出來':'眨眼(或點格子)';hp.disabled=$('blink').disabled;const hc=$('hcalib');if(hc){hc.hidden=running;hc.disabled=$('calib')?.disabled}};
+const syncObs=new MutationObserver(sync);['goal','time','msg','start'].forEach(id=>syncObs.observe($(id),{childList:true,characterData:true,subtree:true,attributes:true}));
+$('hstart').onclick=()=>$('start').click();
+$('hpress').addEventListener('pointerdown',e=>{e.preventDefault();press();sync()});
+syncObs.observe($('blink'),{attributes:true});
+if($('hcalib'))$('hcalib').onclick=()=>{if(window.camReady)$('calib').click();else if(!$('camon').hidden)$('camon').click()};
+const setBig=on=>{document.body.classList.toggle('big',on);sync();
+  confirmed=false;if(window.gazeOn){window.gazeOn=false;window.gazeCell=-1;const gd=document.getElementById('gdot');if(gd)gd.style.display='none';const t='格子大小改變了,請重新按「校正視線」。';const g=$('gzstat');if(g)g.textContent=t;const h=$('hcam');if(h)h.textContent=t}
+  try{if(on&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}};
+document.querySelector('.boardbox').addEventListener('pointerdown',e=>{if(document.body.classList.contains('big')&&running&&mode!=='gaze'){e.preventDefault();press()}});
+$('bigon').onclick=()=>setBig(true);$('hexit').onclick=()=>setBig(false);
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('big'))setBig(false)});
+window.gameJump=m=>{mode=m;setup()};
+setup();
+}
+</script>
+<script type="module">
+const $=id=>document.getElementById(id);
+const V='0.10.14';
+const dot=document.createElement('div');dot.id='gdot';document.body.appendChild(dot);
+const hud=t=>{const h=$('hcam');if(h)h.textContent=t};
+$('camon').onclick=async()=>{
+  $('camon').hidden=true;$('campanel').hidden=false;
+  const st={set textContent(t){$('camstat').textContent=t;hud(t)}};
+  hud('鏡頭載入中……');window.camLoading=true;window.camErr='';window.guideUpdate?.();
+  let stream;
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'}})}
+  catch(e){st.textContent='無法開啟鏡頭:請允許瀏覽器使用相機,並用 Chrome 直接開啟這個檔案。';$('camon').hidden=false;window.camLoading=false;window.camErr='無法開啟鏡頭:請在網址列左邊允許使用相機,再按「再試一次」。';window.guideUpdate?.();return}
+  const vid=$('vid');vid.srcObject=stream;await vid.play();
+  let fl;
+  try{
+    const {FaceLandmarker,FilesetResolver}=await import(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${V}`);
+    const fs=await FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${V}/wasm`);
+    fl=await FaceLandmarker.createFromOptions(fs,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',delegate:'GPU'},outputFaceBlendshapes:true,outputFacialTransformationMatrixes:true,runningMode:'VIDEO',numFaces:1});
+  }catch(e){st.textContent='臉部偵測載入失敗:請確認有連上網路,再按一次「開啟鏡頭」。';stream.getTracks().forEach(t=>t.stop());$('camon').hidden=false;window.camLoading=false;window.camErr='臉部偵測載入失敗:請確認有連上網路,再按「再試一次」。';window.guideUpdate?.();return}
+  $('camstat').textContent='準備好了!刻意閉眼一下就等於按一次(自然眨眼太短,不會觸發)。';hud('鏡頭 OK,請按「校正視線」');
+  window.camReady=true;window.camLoading=false;window.guideUpdate?.();const hc=$('hcalib');if(hc)hc.textContent='校正視線';
+  let th=.5,hold=350,shutAt=0,fired=false,last=-1,noFace=false;
+  $('gzrow').hidden=false;
+  // ---- gaze: features -> screen position (ridge regression), smoothed, with cell hysteresis
+  let calTarget=-1,samples=[],model=null,sx=null,sy=null,cand=-1,candAt=0;
+  const cellsEl=()=>[...document.querySelectorAll('.cell')];
+  const gz=t=>{$('gzstat').textContent=t;hud(t)};
+  const getF=(lm,g,mt)=>{
+    const P=i=>lm[i];
+    const hx=(ir,a,b)=>(P(ir).x-P(a).x)/(P(b).x-P(a).x);
+    const eyeW=(Math.hypot(P(133).x-P(33).x,P(133).y-P(33).y)+Math.hypot(P(263).x-P(362).x,P(263).y-P(362).y))/2;
+    const h=(hx(468,33,133)+hx(473,362,263))/2;
+    const vL=(P(468).y-(P(33).y+P(133).y)/2)/eyeW, vR=(P(473).y-(P(362).y+P(263).y)/2)/eyeW;
+    const bh=(g('eyeLookOutLeft')-g('eyeLookInLeft')+g('eyeLookInRight')-g('eyeLookOutRight'))/2;
+    const bv=(g('eyeLookDownLeft')+g('eyeLookDownRight')-g('eyeLookUpLeft')-g('eyeLookUpRight'))/2;
+    let yaw=0,pitch=0;if(mt){const d=mt.data;yaw=Math.atan2(d[8],d[10]);pitch=Math.asin(Math.max(-1,Math.min(1,-d[9])))}
+    return [h,(vL+vR)/2,bh,bv,yaw,pitch];
+  };
+  const solve=(A,b)=>{const n=b.length;const M=A.map((r,i)=>[...r,b[i]]);
+    for(let c=0;c<n;c++){let p=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;[M[c],M[p]]=[M[p],M[c]];
+      for(let r=0;r<n;r++)if(r!==c){const f=M[r][c]/M[c][c];for(let k=c;k<=n;k++)M[r][k]-=f*M[c][k]}}
+    return M.map((r,i)=>r[n]/r[i]);};
+  const fit=(rows)=>{ // rows: [f, x, y]
+    const d=rows[0][0].length,mu=[],sd=[];
+    for(let k=0;k<d;k++){const v=rows.map(r=>r[0][k]);const m=v.reduce((a,b)=>a+b)/v.length;mu[k]=m;sd[k]=Math.sqrt(v.reduce((a,b)=>a+(b-m)**2,0)/v.length)||1}
+    const Z=rows.map(r=>[...r[0].map((x,k)=>(x-mu[k])/sd[k]),1]);const n=d+1,lam=.5;
+    const AtA=[...Array(n)].map((_,i)=>[...Array(n)].map((_,j)=>Z.reduce((a,z)=>a+z[i]*z[j],0)+(i===j&&i<d?lam:0)));
+    const Atb=t=>[...Array(n)].map((_,i)=>Z.reduce((a,z,q)=>a+z[i]*rows[q][t],0));
+    return {mu,sd,wx:solve(AtA,Atb(1)),wy:solve(AtA.map(r=>[...r]),Atb(2))};
+  };
+  const predict=f=>{const z=[...f.map((x,k)=>(x-model.mu[k])/model.sd[k]),1];return [z.reduce((a,v,k)=>a+v*model.wx[k],0),z.reduce((a,v,k)=>a+v*model.wy[k],0)]};
+  const cellAt=(x,y,cur)=>{const els=cellsEl();
+    if(cur>=0){const r=els[cur].getBoundingClientRect(),mx=r.width*.12,my=r.height*.12;if(x>r.left-mx&&x<r.right+mx&&y>r.top-my&&y<r.bottom+my)return cur}
+    for(let i=0;i<9;i++){const r=els[i].getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return i}return -1};
+  $('calib').onclick=async()=>{
+    const m=window.gameMode();
+    if(m==='speech'||m==='result'||window.gameRunning()){gz('請在第 1–3 關、還沒按「開始」時校正(需要看得到格子板)。');return}
+    window.gazeOn=false;dot.style.display='none';$('calib').disabled=true;window.calibrating=true;window.guideUpdate?.();
+    const els=cellsEl(),rows=[];
+    gz('頭不要動,只轉眼睛,盯著變橘色格子正中間的字……');
+    const order=[4,0,1,2,5,8,7,6,3];
+    for(const i of order){
+      els.forEach(e=>e.classList.remove('calib'));els[i].classList.add('calib');
+      calTarget=-1;samples=[];await new Promise(r=>setTimeout(r,800));
+      calTarget=i;await new Promise(r=>setTimeout(r,1400));calTarget=-1;
+      if(samples.length<8){window.calibrating=false;window.guideUpdate?.();els[i].classList.remove('calib');gz('偵測不到眼睛,請靠近鏡頭、讓臉亮一點再試一次。');$('calib').disabled=false;return}
+      // drop the 25% of samples farthest from the median (glances, blinks)
+      const med=samples[0].map((_,k)=>{const v=samples.map(x=>x[k]).sort((a,b)=>a-b);return v[v.length>>1]});
+      const keep=samples.map(x=>[x,x.reduce((a,v,k)=>a+Math.abs(v-med[k]),0)]).sort((a,b)=>a[1]-b[1]).slice(0,Math.ceil(samples.length*.75));
+      const r=els[i].getBoundingClientRect();keep.forEach(([x])=>rows.push([x,r.left+r.width/2,r.top+r.height/2]));
+    }
+    els.forEach(e=>e.classList.remove('calib'));
+    model=fit(rows);sx=sy=null;cand=-1;window.gazeCell=-1;window.gazeOn=true;window.calibrating=false;setTimeout(()=>window.guideUpdate?.(),0);
+    $('calib').disabled=false;$('calib').textContent='重新校正';
+    gz('校正完成!橘色圓點是系統以為你在看的位置。圓點停在格子裡,那格才會開始累積。');
+    const n=$('note');if(window.gameMode()==='gaze')n.textContent='正在用鏡頭追蹤你的視線。頭盡量不要動;如果圓點一直偏掉,按「重新校正」。';
+  };
+  $('th').oninput=e=>{th=+e.target.value;$('thv').textContent=th.toFixed(2)};
+  $('ho').oninput=e=>{hold=e.target.value*1000;$('hov').textContent=(+e.target.value).toFixed(2)+' 秒'};
+  const loop=()=>{
+    if(vid.currentTime!==last){last=vid.currentTime;
+      const r=fl.detectForVideo(vid,performance.now());const bs=r.faceBlendshapes?.[0]?.categories;
+      if(!bs){$('eyev').textContent='找不到臉';$('eyem').style.width='0';if(!noFace){noFace=true;hud('找不到臉:請正對鏡頭、靠近一點')}}
+      else{
+        if(noFace){noFace=false;hud(window.gazeOn?'正在追蹤視線':'鏡頭 OK,請按「校正視線」')}
+        const g=n=>bs.find(c=>c.categoryName===n)?.score||0;
+        const v=Math.min(g('eyeBlinkLeft'),g('eyeBlinkRight'));
+        const lm=r.faceLandmarks?.[0];
+        if(lm&&lm.length>=478&&v<th*.8){ // skip frames while eyes are closing; keep last estimate
+          const f=getF(lm,g,r.facialTransformationMatrixes?.[0]);
+          if(calTarget>=0)samples.push(f);
+          if(window.gazeOn&&model){
+            const [px,py]=predict(f);const a=.18;
+            sx=sx==null?px:sx+a*(px-sx);sy=sy==null?py:sy+a*(py-sy);
+            const W=innerWidth,H=innerHeight,x=Math.max(8,Math.min(W-8,sx)),y=Math.max(8,Math.min(H-8,sy));
+            dot.style.display='block';dot.style.transform=`translate(${x-16}px,${y-16}px)`;
+            const now=performance.now(),c=cellAt(x,y,window.gazeCell);
+            if(c===window.gazeCell){cand=c}
+            else if(c!==cand){cand=c;candAt=now}
+            else if(now-candAt>250){window.gazeCell=c}
+          }
+        }
+        window.eyeLevel?.(v/th);$('eyev').textContent=v.toFixed(2);const m=$('eyem');m.style.width=(v*100)+'%';
+        const shut=v>=th;m.classList.toggle('shut',shut);
+        const now=performance.now();
+        if(shut){if(!shutAt)shutAt=now;if(!fired&&now-shutAt>=hold){fired=true;window.gameEye()}}
+        else{shutAt=0;fired=false}
+      }}
+    requestAnimationFrame(loop);
+  };
+  loop();
+};
+</script>
+</body>
+</html>
