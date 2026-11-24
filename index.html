@@ -119,10 +119,10 @@ body.big #hud{display:flex;position:fixed;z-index:60;top:0;left:0;right:0;height
 <div class="wrap">
 <header>
 <h1>如果你只剩下「眨眼」這一個動作</h1>
-<p>想像你是一位漸凍人,全身幾乎動不了,只剩一個動作能用。用四種不同的溝通方式,把一句需求傳達出去,看看各要花多久。</p>
+<p>想像你是一位漸凍人,全身幾乎動不了,只剩一個動作能用。用三種不同的溝通方式,把一句需求傳達出去,看看各要花多久。</p>
 </header>
 <ul class="steps" id="steps">
-<li data-s="scan">1 掃描板</li><li data-s="gaze">2 眼動盯選</li><li data-s="p300">3 P300 閃爍板</li><li data-s="speech">4 語音 BCI</li><li data-s="result">結果</li>
+<li data-s="scan">1 掃描板</li><li data-s="gaze">2 眼動盯選</li><li data-s="p300">3 P300 閃爍板</li><li data-s="result">結果</li>
 </ul>
 
 <div id="hud"><div class="hg">目標<b id="hgoal"></b></div><div class="ht" id="htime"></div><div class="hm" id="hmsg"></div><button class="primary" id="hstart"></button><button class="primary" id="hpress" hidden style="background:var(--coral);color:#3a1606"></button><span class="hg" id="hcam" style="max-width:220px;white-space:normal;line-height:1.3">鏡頭未開啟</span><button class="ghost" id="hcalib">開啟鏡頭</button><button class="ghost" id="hexit">縮小</button></div>
@@ -165,8 +165,9 @@ body.big #hud{display:flex;position:fixed;z-index:60;top:0;left:0;right:0;height
 <section class="card result" id="result" hidden>
 <h2 id="rtitle"></h2>
 <div class="bars" id="bars"></div>
+<p class="ref" style="margin:0 0 18px;font-size:18px">對照研究:植入式語音 BCI 讀取大腦說話運動區的訊號,每分鐘可達 62 個英文單字(Willett et al., 2023)。但它要開腦手術,目前仍在臨床試驗,所以這裡沒辦法讓大家體驗。</p>
 <p class="ask">討論:如果每一句話都要花這麼久,你會選擇說什麼?又會放棄說什麼?</p>
-<p class="note">這是課堂體驗用的模擬,不是真的腦波:時間會依每個人的疲勞、專注與訓練程度而不同。真實的 P300 不需要按鍵,是由腦波偵測你「注意到目標」的反應;植入式語音 BCI 需要開腦手術,目前仍在臨床試驗階段。</p>
+<p class="note">這是課堂體驗用的模擬,不是真的腦波:時間會依每個人的疲勞、專注與訓練程度而不同。真實的 P300 不需要按鍵,是由腦波偵測你「注意到目標」的反應。</p>
 <div class="row" style="margin-top:18px"><button class="primary" id="again">再玩一次</button></div>
 </section>
 </div>
@@ -284,7 +285,7 @@ function finish(i){
   if(i>=0){clearBoard();cells[i].classList.add('pick')}
   res[mode]={ms,errs};
   say(mode==='speech'?`完成!只花了 ${fmt(ms)}。`:`成功傳達「${ROUNDS[mode].goal}」!花了 ${fmt(ms)}。`);
-  const next={scan:'gaze',gaze:'p300',p300:'speech',speech:'result'}[mode];
+  const next={scan:'gaze',gaze:'p300',p300:'result',speech:'result'}[mode];
   $('start').hidden=false;$('start').textContent=next==='result'?'看結果':'下一關';
   $('start').onclick=()=>{mode=next;$('start').onclick=startClick;setup()};
 }
@@ -306,10 +307,10 @@ $('speed').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
   if(running&&mode==='scan'){clearInterval(tick);tick=setInterval(stepScan,speed)}});
 
 function showResult(){
-  const rows=[['scan','單鍵掃描板','叫家人',''],['gaze','眼動盯選','翻身',''],['p300','P300 閃爍板','喝水',''],['speech','植入式語音 BCI','一整句話','c']];
+  const rows=[['scan','單鍵掃描板','叫家人',''],['gaze','眼動盯選','翻身',''],['p300','P300 閃爍板','喝水','']];
   const max=Math.max(...rows.map(r=>res[r[0]]?.ms||0),1);
-  const a=res.scan?.ms||0,c=res.speech?.ms||0;
-  $('rtitle').textContent=`說三個字,掃描板花了 ${fmt(a)};說一整句話,語音 BCI 只花了 ${fmt(c)}`;
+  const tot=['scan','gaze','p300'].reduce((t,k)=>t+(res[k]?.ms||0),0),errs=['scan','gaze','p300'].reduce((t,k)=>t+(res[k]?.errs||0),0);
+  $('rtitle').textContent=`只說了三個詞,就花了 ${fmt(tot)}`+(errs?`,還被誤會 ${errs} 次`:'');
   $('bars').innerHTML=rows.map(([k,n,w,cl])=>`<div class="bar"><label><span>${n}(${w})${res[k]?.errs?`・被誤會 ${res[k].errs} 次`:''}</span><b>${fmt(res[k]?.ms||0)}</b></label><div class="track"><div class="fill ${cl}" data-w="${(res[k]?.ms||0)/max*100}"></div></div></div>`).join('');
   requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%')));
 }
