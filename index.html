@@ -110,6 +110,16 @@ body.big #hud{display:flex;position:fixed;z-index:60;top:0;left:0;right:0;height
 #gtext{font-size:22px;line-height:1.55;margin:0 0 20px}
 #gbtns button{flex:1 1 200px;min-height:56px;font-size:18px}
 .gmeter{height:18px;background:var(--deep);border-radius:9px;overflow:hidden;margin:-6px 0 18px}.gmeter i{display:block;height:100%;width:0;background:var(--teal)}
+#welcome{position:fixed;inset:0;z-index:95;background:rgba(10,25,45,.8);display:grid;place-items:center;padding:20px;overflow:auto}
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:clamp(20px,3vw,36px);max-width:720px;width:100%;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+.wcard h2{font-size:clamp(24px,3vw,32px);line-height:1.2;margin:0 0 8px}.wcard p{margin:0;color:var(--soft)}
+.wlist{padding-left:1.3em;margin:14px 0 16px;line-height:1.8}
+.wtip{background:var(--deep);border-left:5px solid var(--coral);border-radius:12px;padding:14px 18px;margin-bottom:20px}
+.wtip b.h{color:var(--coral);font-size:18px}.wtip ul{margin:6px 0 0;padding-left:1.2em;line-height:1.75}
+.wcard .row button{min-height:54px;font-size:17px}
+#headwarn{position:fixed;left:50%;top:118px;transform:translateX(-50%);z-index:92;background:var(--coral);color:#3a1606;font-weight:700;padding:10px 22px;border-radius:999px;box-shadow:0 8px 20px rgba(0,0,0,.35);max-width:92vw;text-align:center}
+body:not(.big) #headwarn{top:16px}
+.gnote{margin:-8px 0 16px;color:var(--coral);font-weight:700;font-size:16px}
 [hidden]{display:none!important}
 @media (max-width:760px){.game{grid-template-columns:minmax(0,1fr)}.cell.target::after{font-size:11px;top:4px;right:6px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -120,13 +130,31 @@ body.big #hud{display:flex;position:fixed;z-index:60;top:0;left:0;right:0;height
 <header>
 <h1>如果你只剩下「眨眼」這一個動作</h1>
 <p>想像你是一位漸凍人,全身幾乎動不了,只剩一個動作能用。用三種不同的溝通方式,把一句需求傳達出去,看看各要花多久。</p>
+<button class="ghost" id="helpbtn" style="margin-top:14px">使用說明與注意事項</button>
 </header>
 <ul class="steps" id="steps">
 <li data-s="scan">1 掃描板</li><li data-s="gaze">2 眼動盯選</li><li data-s="p300">3 P300 閃爍板</li><li data-s="result">結果</li>
 </ul>
 
 <div id="hud"><div class="hg">目標<b id="hgoal"></b></div><div class="ht" id="htime"></div><div class="hm" id="hmsg"></div><button class="primary" id="hstart"></button><button class="primary" id="hpress" hidden style="background:var(--coral);color:#3a1606"></button><span class="hg" id="hcam" style="max-width:220px;white-space:normal;line-height:1.3">鏡頭未開啟</span><button class="ghost" id="hcalib">開啟鏡頭</button><button class="ghost" id="hexit">縮小</button></div>
-<div id="guide" hidden><div class="gcard"><p class="gk" id="gk">開始前的準備</p><ol id="gsteps"></ol><p id="gtext"></p><div class="gmeter" id="gmeter" hidden><i id="gmi"></i></div><div class="row" id="gbtns"></div></div></div>
+<div id="headwarn" hidden>頭部移動了:請回到剛剛的位置,眨眼和視線偵測才會準</div>
+<div id="welcome"><div class="wcard">
+<h2>歡迎來到眨眼溝通挑戰</h2>
+<p>你將扮演一位全身幾乎動不了、只剩「眨眼」能用的漸凍人,用 3 種方式說出一句需求。</p>
+<ol class="wlist">
+<li><b>單鍵掃描板</b>:亮光輪到目標時,刻意閉眼一下。</li>
+<li><b>眼動盯選</b>:眼睛盯著目標格子 2 秒,就會選取。</li>
+<li><b>P300 閃爍板</b>:目標格子閃起來時閉眼,累積 3 次。</li>
+</ol>
+<div class="wtip"><b class="h">注意事項</b><ul>
+<li>用鏡頭體驗時,<b>頭部盡量保持不動</b>,只動眼睛和眼皮。頭一移動,眨眼和視線偵測就會不準。</li>
+<li>坐在鏡頭正前方、大約一個手臂遠;臉要亮,避免背光。</li>
+<li>自然眨眼太短不會算,要<b>刻意閉眼約半秒</b>。</li>
+<li>戴眼鏡偵測不到時,可以先按「縮小」,在右側鏡頭區調低「靈敏度」。</li>
+</ul></div>
+<div class="row"><button class="primary" id="wgo">開始體驗(全螢幕+鏡頭)</button><button class="ghost" id="wkey">不用鏡頭,用鍵盤/滑鼠玩</button></div>
+</div></div>
+<div id="guide" hidden><div class="gcard"><p class="gk" id="gk">開始前的準備</p><ol id="gsteps"></ol><p id="gtext"></p><p class="gnote" id="gnote" hidden>提醒:頭部保持不動,只動眼睛和眼皮。</p><div class="gmeter" id="gmeter" hidden><i id="gmi"></i></div><div class="row" id="gbtns"></div></div></div>
 <section class="game" id="game">
 <div class="boardbox">
 <div class="board" id="board"></div>
@@ -316,11 +344,11 @@ function showResult(){
 }
 $('again').onclick=()=>{for(const k in res)delete res[k];mode='scan';setup()};
 
-window.gameMode=()=>mode;window.gameRunning=()=>running;window.gameEye=()=>{if(running)press();else{blinkOK=true;guideUpdate()}};
-let confirmed=false,blinkOK=false,skipCam=false;
+window.gameMode=()=>mode;window.gameRunning=()=>running;window.gameEye=()=>{if(running)press();else{blinkCount++;guideUpdate()}};
+let confirmed=false,blinkCount=0,skipCam=false;
 const GOAL={scan:'亮光輪到「叫家人」那一列時閉眼一下,再等那一格亮起時閉眼一下。',gaze:'眼睛盯著「翻身」不要移開,盯滿 2 秒就會選取。',p300:'盯著「喝水」,它每閃一次就閉眼一下,累積 3 次。',speech:'按「開始」後,再按上方橘色的「試著說出來」(或閉眼一下)。'};
-const guideSteps=()=>mode==='gaze'?[['cam','開啟鏡頭'],['cal','校正視線'],['chk','確認圓點'],['go','開始']]:(mode==='scan'||mode==='p300')?[['cam','開啟鏡頭'],['blk','試試閉眼'],['go','開始']]:[['go','開始']];
-const stepDone=k=>k==='go'?false:skipCam?true:k==='cam'?!!window.camReady:k==='cal'?!!window.gazeOn:k==='chk'?confirmed&&!!window.gazeOn:k==='blk'?blinkOK:false;
+const guideSteps=()=>mode==='gaze'?[['cam','開啟鏡頭'],['pos','固定頭部'],['cal','校正視線'],['chk','確認圓點'],['go','開始']]:(mode==='scan'||mode==='p300')?[['cam','開啟鏡頭'],['pos','固定頭部'],['blk','練習閉眼'],['go','開始']]:[['go','開始']];
+const stepDone=k=>k==='go'?false:skipCam?true:k==='cam'?!!window.camReady:k==='pos'?!!window.headBase:k==='cal'?!!window.gazeOn:k==='chk'?confirmed&&!!window.gazeOn:k==='blk'?blinkCount>=2:false;
 const gbtn=(t,fn,cls='primary')=>{const b=document.createElement('button');b.className=cls;b.textContent=t;b.onclick=fn;return b};
 window.eyeLevel=v=>{const m=$('gmi');if(m)m.style.width=Math.min(v,1)*100+'%'};
 function guideUpdate(){
@@ -330,12 +358,16 @@ function guideUpdate(){
   const st=guideSteps(),cur=st.find(([k])=>!stepDone(k))[0];
   $('gk').textContent=ROUNDS[mode].title+'|開始前的準備';
   $('gsteps').innerHTML=st.map(([k,n])=>`<li class="${k===cur?'on':stepDone(k)?'done':''}">${stepDone(k)?'✓ ':''}${n}</li>`).join('');
-  g.classList.toggle('mini',cur==='chk');$('gmeter').hidden=cur!=='blk';
+  g.classList.toggle('mini',cur==='chk');$('gmeter').hidden=cur!=='blk';$('gnote').hidden=skipCam||cur==='cam'||cur==='pos';
   const bt=$('gbtns');bt.innerHTML='';const t=$('gtext');
   const skip=gbtn('不用鏡頭,改用鍵盤/滑鼠',()=>{skipCam=true;guideUpdate()},'ghost');
   if(cur==='cam'){
     t.textContent=window.camLoading?'鏡頭和臉部偵測載入中,請稍等幾秒……':window.camErr?window.camErr:'請坐在鏡頭正前方,臉要亮,頭盡量保持不動。瀏覽器問能不能用相機時,請按「允許」。';
     if(!window.camLoading)bt.append(gbtn(window.camErr?'再試一次':'開啟鏡頭',()=>{if(!$('camon').hidden)$('camon').click()}));bt.append(skip);
+  }else if(cur==='pos'){
+    t.innerHTML='把頭擺在<b>舒服、可以一直維持不動</b>的位置,臉正對鏡頭。擺好後按「記住這個位置」。之後只要頭移動,畫面上方就會跳出提醒。';
+    if(!window.headPose)t.innerHTML+='<br><span style="color:var(--coral)">目前偵測不到臉,請靠近鏡頭、讓臉亮一點。</span>';
+    bt.append(gbtn('記住這個位置',()=>{if(window.headPose){window.setHeadBase();guideUpdate()}}),skip);
   }else if(cur==='cal'){
     t.textContent='等一下九個格子會輪流變橘色。頭不要動,只轉眼睛,盯著橘色格子正中間的字,大約 20 秒。';
     bt.append(gbtn('開始校正',()=>$('calib').click()),skip);
@@ -343,10 +375,10 @@ function guideUpdate(){
     t.textContent='看看橘色圓點:眼睛輪流看四個角落的格子,圓點有沒有跟過去?';
     bt.append(gbtn('準的,下一步',()=>{confirmed=true;guideUpdate()}),gbtn('不準,重新校正',()=>{confirmed=false;$('calib').click()},'ghost'));
   }else if(cur==='blk'){
-    t.textContent='刻意閉上眼睛約半秒,就等於按一下按鈕(自然眨眼太短,不會算)。現在試一次!閉眼時下面的條會變滿。';
-    bt.append(gbtn('跳過',()=>{blinkOK=true;guideUpdate()},'ghost'));
+    t.innerHTML=`刻意閉上眼睛約半秒,就等於按一下按鈕;自然眨眼太短,不會算。閉眼時下面的條會變滿。<br><b>練習成功 ${blinkCount}/2 次</b>`;
+    bt.append(gbtn('跳過',()=>{blinkCount=2;guideUpdate()},'ghost'));
   }else{
-    t.textContent=(skipCam&&mode!=='gaze'&&mode!=='speech'?'用空白鍵或點格子代替閉眼。':'')+(skipCam&&mode==='gaze'?'用滑鼠游標代替視線:把游標停在格子上。':'')+GOAL[mode];
+    t.textContent=(skipCam&&mode!=='gaze'&&mode!=='speech'?'用空白鍵或點格子代替閉眼。':'')+(skipCam&&mode==='gaze'?'用滑鼠游標代替視線:把游標停在格子上。':'')+GOAL[mode]+(skipCam?'':' 記得:頭保持不動。');
     bt.append(gbtn('開始',()=>$('start').click()));
   }
 }
@@ -365,6 +397,9 @@ document.querySelector('.boardbox').addEventListener('pointerdown',e=>{if(docume
 $('bigon').onclick=()=>setBig(true);$('hexit').onclick=()=>setBig(false);
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('big'))setBig(false)});
 window.gameJump=m=>{mode=m;setup()};
+$('wgo').onclick=()=>{$('welcome').hidden=true;setBig(true);if(!window.camReady&&!window.camLoading&&!$('camon').hidden)$('camon').click()};
+$('wkey').onclick=()=>{$('welcome').hidden=true;skipCam=true;guideUpdate()};
+$('helpbtn').onclick=()=>{$('welcome').hidden=false};
 setup();
 }
 </script>
@@ -389,7 +424,8 @@ $('camon').onclick=async()=>{
   }catch(e){st.textContent='臉部偵測載入失敗:請確認有連上網路,再按一次「開啟鏡頭」。';stream.getTracks().forEach(t=>t.stop());$('camon').hidden=false;window.camLoading=false;window.camErr='臉部偵測載入失敗:請確認有連上網路,再按「再試一次」。';window.guideUpdate?.();return}
   $('camstat').textContent='準備好了!刻意閉眼一下就等於按一次(自然眨眼太短,不會觸發)。';hud('鏡頭 OK,請按「校正視線」');
   window.camReady=true;window.camLoading=false;window.guideUpdate?.();const hc=$('hcalib');if(hc)hc.textContent='校正視線';
-  let th=.5,hold=350,shutAt=0,fired=false,last=-1,noFace=false;
+  let th=.5,hold=350,shutAt=0,fired=false,last=-1,noFace=false,moved=false;
+  window.setHeadBase=()=>{if(window.headPose){window.headBase={...window.headPose};moved=false;$('headwarn').hidden=true}};
   $('gzrow').hidden=false;
   // ---- gaze: features -> screen position (ridge regression), smoothed, with cell hysteresis
   let calTarget=-1,samples=[],model=null,sx=null,sy=null,cand=-1,candAt=0;
@@ -440,7 +476,7 @@ $('camon').onclick=async()=>{
       const r=els[i].getBoundingClientRect();keep.forEach(([x])=>rows.push([x,r.left+r.width/2,r.top+r.height/2]));
     }
     els.forEach(e=>e.classList.remove('calib'));
-    model=fit(rows);sx=sy=null;cand=-1;window.gazeCell=-1;window.gazeOn=true;window.calibrating=false;setTimeout(()=>window.guideUpdate?.(),0);
+    model=fit(rows);sx=sy=null;cand=-1;window.gazeCell=-1;window.gazeOn=true;window.calibrating=false;window.setHeadBase();setTimeout(()=>window.guideUpdate?.(),0);
     $('calib').disabled=false;$('calib').textContent='重新校正';
     gz('校正完成!橘色圓點是系統以為你在看的位置。圓點停在格子裡,那格才會開始累積。');
     const n=$('note');if(window.gameMode()==='gaze')n.textContent='正在用鏡頭追蹤你的視線。頭盡量不要動;如果圓點一直偏掉,按「重新校正」。';
@@ -450,8 +486,14 @@ $('camon').onclick=async()=>{
   const loop=()=>{
     if(vid.currentTime!==last){last=vid.currentTime;
       const r=fl.detectForVideo(vid,performance.now());const bs=r.faceBlendshapes?.[0]?.categories;
-      if(!bs){$('eyev').textContent='找不到臉';$('eyem').style.width='0';if(!noFace){noFace=true;hud('找不到臉:請正對鏡頭、靠近一點')}}
+      if(!bs){window.headPose=null;$('eyev').textContent='找不到臉';$('eyem').style.width='0';if(!noFace){noFace=true;hud('找不到臉:請正對鏡頭、靠近一點')}}
       else{
+        const mt=r.facialTransformationMatrixes?.[0];
+        if(mt){const d=mt.data,yaw=Math.atan2(d[8],d[10])*57.3,pitch=Math.asin(Math.max(-1,Math.min(1,-d[9])))*57.3;
+          window.headPose={yaw,pitch,x:d[12],y:d[13]};
+          const b=window.headBase;
+          if(b){const dev=Math.max(Math.abs(yaw-b.yaw)/8,Math.abs(pitch-b.pitch)/8,Math.hypot(d[12]-b.x,d[13]-b.y)/3);
+            if(dev>1)moved=true;else if(dev<.7)moved=false;$('headwarn').hidden=!moved}}
         if(noFace){noFace=false;hud(window.gazeOn?'正在追蹤視線':'鏡頭 OK,請按「校正視線」')}
         const g=n=>bs.find(c=>c.categoryName===n)?.score||0;
         const v=Math.min(g('eyeBlinkLeft'),g('eyeBlinkRight'));
